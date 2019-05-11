@@ -6756,11 +6756,13 @@ void Renderer::renderPointStars(const AstroDatabase& aDB,
     else
         starRenderer.starVertexBuffer->startSprites();
 
+#ifdef OCTREE_DEBUG
     m_starProcStats.reset();
     m_starProcStats.selection = m_selected;
     m_starProcStats.obsPos = obsPos;
     m_starProcStats.limit = faintestMagNight;
     create5FrustumPlanes(m_starProcStats.frustPlanes, obsPos, observer.getOrientationf(), degToRad(fov), windowWidth / windowHeight);
+#endif
     processVisibleStars(
         aDB.getStarOctree(),
         starRenderer,
@@ -6768,15 +6770,12 @@ void Renderer::renderPointStars(const AstroDatabase& aDB,
         observer.getOrientationf(),
         degToRad(fov),
         windowWidth / windowHeight,
+#ifdef OCTREE_DEBUG
         faintestMagNight,
         &m_starProcStats);
-    /*starDB.findVisibleStars(starRenderer,
-                            obsPos.cast<float>(),
-                            observer.getOrientationf(),
-                            degToRad(fov),
-                            (float) windowWidth / (float) windowHeight,
-                            faintestMagNight);
-                            */
+#else
+        faintestMagNight);
+#endif
 
     starRenderer.starVertexBuffer->render();
     starRenderer.glareVertexBuffer->render();
@@ -7043,9 +7042,11 @@ void Renderer::renderDeepSkyObjects(const Universe&  universe,
 
     glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 
+#ifdef OCTREE_DEBUG
     m_dsoProcStats.reset();
     m_dsoProcStats.selection = m_selected;
     m_dsoProcStats.limit = 2 * faintestMagNight;
+#endif
     processVisibleDsos(
         aDB->getDsoOctree(),
         dsoRenderer,
@@ -7053,8 +7054,12 @@ void Renderer::renderDeepSkyObjects(const Universe&  universe,
         observer.getOrientationf(),
         degToRad(fov),
         windowWidth / windowHeight,
+#ifdef OCTREE_DEBUG
         2 * faintestMagNight,
         &m_dsoProcStats);
+#else
+        2 * faintestMagNight);
+#endif
 
     // clog << "DSOs processed: " << dsoRenderer.dsosProcessed << endl;
 
